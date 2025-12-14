@@ -1,0 +1,143 @@
+(oapoc) (base) harry@harry-Vostro-14-5401:~/Desktop/research/poc/oapoc/src/app/evaluation$ uv run python test_oapoc_pipeline.py 
+
+======================================================================
+OAPOC RETRIEVAL PIPELINE TESTER
+======================================================================
+Initializing tester...
+Vector store: /home/harry/Desktop/research/poc/oapoc/src/data/vector_store
+Test data: /home/harry/Desktop/research/poc/oapoc/src/data/processed/discharge.json
+Retriever loaded successfully.
+Loaded 1206 chunks for testing
+
+
+Select test to run:
+1. Quick Diagnostic (identify issues)
+2. Scenario Testing (test medical queries)
+3. Parameter Simulation (estimate improvements)
+4. Generate Optimization Script
+5. Run All Tests
+0. Exit
+Enter choice (0-5): 5
+============================================================
+QUICK DIAGNOSTIC TEST
+============================================================
+
+DIAGNOSTIC RESULTS:
+----------------------------------------
+Boilerplate Queries              0 (  0.0%)
+Short Queries                    1 (  2.0%)
+Boundary Splits                  0 (  0.0%)
+Perfect Matches                 48 ( 96.0%)
+Same Note Different Chunk        0 (  0.0%)
+Complete Misses                  1 (  2.0%)
+
+KEY FINDINGS:
+----------------------------------------
+hjjjjjhnhhjhjhjhjjjhn
+Estimated Recall: 96.0%
+
+============================================================
+SCENARIO-BASED TESTING
+============================================================
+
+Testing: Cardiac Conditions
+----------------------------------------
+  Query: 'patient with acute myocardial infarction...'
+  Relevance: 46.7%
+  Query: 'history of atrial fibrillation...'
+  Relevance: 58.3%
+  Query: 'coronary artery disease with stents...'
+  Relevance: 46.7%
+  Query: 'congestive heart failure exacerbation...'
+  Relevance: 25.0%
+
+  → Overall Cardiac Conditions Performance: 44.2%
+
+Testing: Medications
+----------------------------------------
+  Query: 'started on metoprolol 25mg...'
+  Relevance: 50.0%
+  Query: 'aspirin 81mg daily...'
+  Relevance: 44.4%
+  Query: 'anticoagulation with warfarin...'
+  Relevance: 55.6%
+  Query: 'diuretics for fluid overload...'
+  Relevance: 50.0%
+
+  → Overall Medications Performance: 50.0%
+
+Testing: Symptoms
+----------------------------------------
+  Query: 'chest pain radiating to left arm...'
+  Relevance: 77.8%
+  Query: 'shortness of breath on exertion...'
+  Relevance: 73.3%
+  Query: 'palpitations and dizziness...'
+  Relevance: 44.4%
+  Query: 'lower extremity edema...'
+  Relevance: 33.3%
+
+  → Overall Symptoms Performance: 57.2%
+
+Testing: Diagnostics
+----------------------------------------
+  Query: 'ECG showed ST elevation...'
+  Relevance: 0.0%
+  Query: 'chest x-ray revealed pulmonary edema...'
+  Relevance: 40.0%
+  Query: 'troponin levels elevated...'
+  Relevance: 33.3%
+  Query: 'ejection fraction 35%...'
+  Relevance: 22.2%
+
+  → Overall Diagnostics Performance: 23.9%
+
+============================================================
+SCENARIO SUMMARY
+============================================================
+❌ Cardiac Conditions    44.2%
+⚠️ Medications           50.0%
+⚠️ Symptoms              57.2%
+❌ Diagnostics           23.9%
+
+Average Performance: 43.8%
+
+Performance below target (70%)
+Recommended immediate fixes:
+1. Reduce chunk_size to 200 (currently 250)
+2. Increase overlap to 100 (currently 50)
+3. Re-index with new parameters
+
+============================================================
+PARAMETER OPTIMIZATION SIMULATION
+============================================================
+
+Simulating retrieval with optimized parameters...
+(This estimates improvement without re-indexing)
+
+POTENTIAL IMPROVEMENTS:
+----------------------------------------
+Query Expansion:    +0.0% potential improvement
+Context Addition:   +0.0% potential improvement
+Boilerplate Filter: +5-8% estimated improvement
+
+Estimated recall after optimizations: 70.0%
+     Additional optimizations needed:
+   - Consider medical-specific embeddings
+   - Implement hybrid search
+
+============================================================
+GENERATING OPTIMIZATION SCRIPT
+============================================================
+Optimization script saved to: optimize_oapoc.sh
+
+To apply optimizations, run:
+  bash optimize_oapoc.sh
+
+This will:
+  1. Backup your current data
+  2. Update chunking parameters
+  3. Re-process and re-index your data
+
+Note: Re-indexing will take ~4 hours on CPU
+============================================================

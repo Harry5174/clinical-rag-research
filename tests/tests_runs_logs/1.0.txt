@@ -1,0 +1,44 @@
+(oapoc) (base) harry@harry-Vostro-14-5401:~/Desktop/research/poc/oapoc$ ./src/app/evaluation/optimize_oapoc.sh
+=========================================
+OAPOC PIPELINE OPTIMIZATION
+=========================================
+Creating backup...
+Updating chunking parameters...
+Clearing old data...
+Re-processing data with optimized parameters...
+
+1. RUNNING ETL (Limit: 500 rows)...
+--- ETL STARTED: discharge.csv (Strategy: Hybrid Semantic) ---
+Limiting import to first 500 rows...
+Processing 371 cardiac-related records...
+--- ETL COMPLETE: Saved 1296 semantic chunks to discharge.json ---
+
+2. RUNNING INDEXER...
+--- INDEXING STARTED: BAAI/bge-base-en-v1.5 ---
+Loaded 1296 chunks from discharge.json
+Embedding 1296 documents...
+Batches: 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 41/41 [09:41<00:00, 14.19s/it]
+--- INDEXING COMPLETE ---
+Index: /home/harry/Desktop/research/poc/oapoc/src/data/vector_store/poc_index.index
+Metadata: /home/harry/Desktop/research/poc/oapoc/src/data/vector_store/poc_metadata.pkl
+
+3. TESTING RETRIEVAL...
+Retriever loaded successfully.
+
+Query: patient diagnosed with acute myocardial infarction
+
+[Result 1] (Score L2: 0.4593)
+Note ID: 10010058-DS-13
+Snippet: Mr. ___ is a ___ year old male with past medical history
+significant for ischemic cardiomyopathy with LVEF 35%, coronary
+artery disease ___ silent ant...
+
+[Result 2] (Score L2: 0.4802)
+Note ID: 10010058-DS-13
+Snippet: significant for ischemic cardiomyopathy with LVEF 35%, coronary
+artery disease ___ silent anterior MI of indeterminate age
+(presumed to be years ago),...
+=========================================
+Optimization complete!
+Run evaluation to verify improvements.
+=========================================

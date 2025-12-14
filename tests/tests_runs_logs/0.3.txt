@@ -1,0 +1,20 @@
+(oapoc) (base) harry@harry-Vostro-14-5401:~/Desktop/research/poc/oapoc/src/app/evaluation$ uv run python run_eval.py 
+--- STARTING FINAL EVALUATION (N=50) ---
+Retriever loaded successfully.
+
+Filtering for high-quality queries...
+Progress: 50/50
+
+==================================================
+       FINAL POC VALIDATION REPORT       
+==================================================
+Total Quality Queries: 50
+Avg Latency:           0.1678s
+--------------------------------------------------
+STRICT Chunk Recall@5: 52.0%
+   (Exact text window match)
+--------------------------------------------------
+PARENT Note Recall@5:  64.0%
+   (Correct Patient Document retrieved)
+==================================================
+WARNING: Review embedding model selection.

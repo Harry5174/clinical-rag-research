@@ -1,0 +1,23 @@
+(oapoc) (base) harry@harry-Vostro-14-5401:~/Desktop/research/poc/oapoc/src/app/evaluation$ uv run python run_eval.py 
+--- STARTING EVALUATION (N=50) ---
+Retriever loaded successfully.
+
+Processing 50 synthetic queries...
+Processed 0/50...
+Processed 10/50...
+Processed 20/50...
+Processed 30/50...
+
+========================================
+       EVALUATION RESULTS REPORT       
+========================================
+Total Queries:      45
+Avg Latency:        0.0810s
+----------------------------------------
+Hit Rate @ 1:       2.2%  (Perfect match)
+Hit Rate @ 3:       6.7%  (In top 3)
+Hit Rate @ 5:       8.9%  (In top 5)
+----------------------------------------
+MRR Score:          0.0452  (0-1 Scale)
+========================================
+FAILED: Embeddings or Indexing likely broken.

@@ -1,0 +1,35 @@
+=========================================
+(oapoc) (base) harry@harry-Vostro-14-5401:~/Desktop/research/poc/oapoc$ uv run python src/app/main.py
+
+1. RUNNING ETL (Limit: 500 rows)...
+--- ETL STARTED: discharge.csv (Strategy: Hybrid Semantic) ---
+Limiting import to first 500 rows...
+Processing 371 cardiac-related records...
+--- ETL COMPLETE: Saved 1206 semantic chunks to discharge.json ---
+
+2. RUNNING INDEXER...
+--- INDEXING STARTED: BAAI/bge-base-en-v1.5 ---
+Loaded 1206 chunks from discharge.json
+Embedding 1206 documents...
+Batches: 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 38/38 [10:31<00:00, 16.61s/it]
+--- INDEXING COMPLETE ---
+Index: /home/harry/Desktop/research/poc/oapoc/src/data/vector_store/poc_index.index
+Metadata: /home/harry/Desktop/research/poc/oapoc/src/data/vector_store/poc_metadata.pkl
+
+3. TESTING RETRIEVAL...
+Retriever loaded successfully.
+
+Query: patient diagnosed with acute myocardial infarction
+
+[Result 1] (Score L2: 0.4593)
+Note ID: 10010058-DS-13
+Snippet: Mr. ___ is a ___ year old male with past medical history
+significant for ischemic cardiomyopathy with LVEF 35%, coronary
+artery disease ___ silent ant...
+
+[Result 2] (Score L2: 0.4729)
+Note ID: 10009686-DS-18
+Snippet: HISTORY OF PRESENTING ILLNESS:  
+.
+___ yo female presented to ___ today with chest pain. She 
+awoke this AM with burning substernal chest pain. The pa...
