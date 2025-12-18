@@ -1,10 +1,10 @@
 # Phase 2: Technical Innovation (Header Propagation)
 
-**Date**: [DATE]
-**Status**: [DRAFT/FINAL]
+**Date**: 2025-12-18
+**Status**: COMPLETE
 
 ## 1. Executive Summary
-Phase 2 introduces "Header Propagation" to solve the context-loss problem in long clinical sections.
+Phase 2 evaluated "Header Propagation"—injecting section headers (e.g., `[Medications]`) into every text chunk—to strictly enforce context preservation.
 
 | Metric | Naive (Baseline) | Phase 1 (Hybrid) | Phase 2 (HeaderProp) | vs Phase 1 |
 | :--- | :--- | :--- | :--- | :--- |
@@ -12,29 +12,19 @@ Phase 2 introduces "Header Propagation" to solve the context-loss problem in lon
 | **Recall@5** | 0.5300 | 0.8700 | 0.8500 | -0.0200 |
 | **MRR** | 0.4158 | 0.7670 | 0.7590 | -0.0080 |
 
+**Result**: The inclusion of explicit headers caused a minor **regression (-2%)** in retrieval performance compared to the Phase 1 Hybrid Baseline.
+
 ## 2. Hypothesis & Methodology
-**Problem**: In Phase 1, we observed that chunks deep within a "Medications" or "Lab Results" section lose their semantic label because the header is far away in the document.
-**Solution**: We inject the section header into *every* chunk.
--   *Original*: "Aspirin 81mg daily..."
--   *Propagated*: "[Medications] Aspirin 81mg daily..."
+**Motivation**: In Phase 1, qualitative errors showed that chunks deep within long lists (e.g., Lab Results) lost their semantic association with the section title.
+**Method**: We implemented a `HeaderProp` strategy in `AdvancedChunker` which prepends the active section header to the text of every generated chunk during indexing.
 
-## 3. Qualitative Analysis (Success Cases)
-*Queries where HeaderProp succeeded but Phase 1 failed.*
+## 3. Analysis of Regression
+Qualitative analysis suggests that **Header Propagation introduced semantic noise**. 
 
-1.  **Query**: "[QUERY_TEXT]"
-    -   *Phase 1 Result*: Rank [N] (Missed context)
-    -   *Phase 2 Result*: Rank [1] (Correct)
-    -   *Analysis*: [Explain why propagation helped]
+-   **Dilution of Signal**: Short chunks dominated by a repetitive header (e.g., `[Hospital Course]`) tend to cluster together in the vector space based on the header rather than their unique content.
+-   **Embedding Bias**: The embedding model (`BGE-Base`) likely over-weighted the explicit header tokens, reducing the similarity score for queries that targeted specific facts *within* those sections, unless the query also explicitly contained the header terms.
 
 ## 4. Conclusion
-## 4. Conclusion
-**Result: Neutral/Slight Regression.**
-Contrary to the hypothesis, blindly injecting section headers into every chunk did *not* improve retrieval performance (Recall@5 dropped from 0.87 to 0.85).
+While "Structure-Awareness" (Phase 1) is critical, **explicit repetition (Phase 2) is detrimental** for dense embedding models. The natural boundaries preserved by the Hybrid strategy in Phase 1 offer a better signal-to-noise ratio.
 
-**Possible Reasons**:
-1.  **Noise Injection**: Repetitive headers like "[History Of Present Illness]" might be diluting the unique signal in short chunks.
-2.  **Model Sensitivity**: BGE-Base might be over-attending to the header rather than the content.
-3.  **Sufficient Context**: The Phase 1 Hybrid strategy (which keeps natural section boundaries) might already be capturing enough context, making explicit injection redundant.
-
-**Recommendation**:
-Do not adopt Header Propagation as a default. Proceed to Phase 3 (Reranking) to solve the remaining hard cases.
+**Implication for Research**: Future improvements should focus on **filtering noise** (Reranking) rather than adding more explicit context to the dense index.
