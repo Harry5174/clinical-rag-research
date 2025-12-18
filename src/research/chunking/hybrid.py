@@ -19,6 +19,7 @@ class ChunkingStrategy(Enum):
     SEMANTIC_SECTIONS = "semantic_sections"
     SENTENCE_BASED = "sentence_based"
     HYBRID = "hybrid"
+    HEADER_PROPAGATION = "header_propagation"
 
 @dataclass
 class ChunkConfig:
@@ -86,6 +87,8 @@ class AdvancedChunker:
             return self._sentence_based_chunks(text, metadata)
         elif self.config.strategy == ChunkingStrategy.HYBRID:
             return self._hybrid_chunks(text, metadata)
+        elif self.config.strategy == ChunkingStrategy.HEADER_PROPAGATION:
+            return self._header_propagation_chunks(text, metadata)
         else:
             raise ValueError(f"Unknown strategy: {self.config.strategy}")
     
@@ -218,6 +221,58 @@ class AdvancedChunker:
                     chunk_text, chunk_idx, metadata
                 )
                 chunk_data['section'] = section_name
+                chunks.append(chunk_data)
+                chunk_idx += 1
+        
+        return chunks
+
+    def _header_propagation_chunks(self, text: str, metadata: Dict) -> List[Dict]:
+        """Header Propagation: Inject section headers into every sub-chunk"""
+        chunks = []
+        sections = self.section_detector.detect_sections(text)
+        
+        chunk_idx = 0
+        for section_name, section_content in sections.items():
+            # Use hybrid splitting for the content
+            sentences = self._split_sentences(section_content)
+            current_chunk = []
+            current_word_count = 0
+            
+            # Formatted header to inject
+            header_prefix = f"[{section_name.replace('_', ' ').title()}]\n"
+            header_words = len(header_prefix.split())
+            
+            for sentence in sentences:
+                sentence_words = len(sentence.split())
+                
+                # Check if adding this sentence would exceed max size (accounting for header)
+                if current_word_count + sentence_words + header_words > self.config.chunk_size and current_chunk:
+                    # Save current chunk with HEADER INJECTED
+                    chunk_text = header_prefix + ' '.join(current_chunk)
+                    chunk_data = self._create_chunk_metadata(
+                        chunk_text, chunk_idx, metadata
+                    )
+                    chunk_data['section'] = section_name
+                    chunk_data['is_header_propagated'] = True
+                    chunks.append(chunk_data)
+                    chunk_idx += 1
+                    
+                    # Start new chunk with overlap
+                    overlap_sentences = current_chunk[-2:] if len(current_chunk) > 2 else current_chunk
+                    current_chunk = overlap_sentences + [sentence]
+                    current_word_count = sum(len(s.split()) for s in current_chunk)
+                else:
+                    current_chunk.append(sentence)
+                    current_word_count += sentence_words
+            
+            # Save remaining chunk
+            if current_chunk and current_word_count >= self.config.min_chunk_size:
+                chunk_text = header_prefix + ' '.join(current_chunk)
+                chunk_data = self._create_chunk_metadata(
+                    chunk_text, chunk_idx, metadata
+                )
+                chunk_data['section'] = section_name
+                chunk_data['is_header_propagated'] = True
                 chunks.append(chunk_data)
                 chunk_idx += 1
         
