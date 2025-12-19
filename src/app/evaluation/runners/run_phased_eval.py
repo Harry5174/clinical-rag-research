@@ -5,11 +5,11 @@ from pathlib import Path
 import numpy as np
 
 # Setup paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
 sys.path.append(str(BASE_DIR / "src"))
 
 # Import from valid research paths
-from research.retrieval.base import Retriever
+from app.research.retrieval.base import Retriever
 
 # CONFIG
 DATA_DIR = BASE_DIR / "data"

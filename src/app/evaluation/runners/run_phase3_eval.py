@@ -5,12 +5,12 @@ from pathlib import Path
 import numpy as np
 
 # Setup paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-sys.path.append(str(BASE_DIR))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
+sys.path.append(str(BASE_DIR / "src"))
 
 # Import retrievers
-from src.research.retrieval.base import Retriever
-from src.research.retrieval.two_stage import TwoStageRetriever
+from app.research.retrieval.base import Retriever
+from app.research.retrieval.two_stage import TwoStageRetriever
 
 # CONFIG
 DATA_DIR = BASE_DIR / "data"

@@ -4,7 +4,7 @@ from typing import List, Dict
 from sentence_transformers import CrossEncoder
 import numpy as np
 
-from .base import Retriever
+from app.research.retrieval.base import Retriever
 
 class TwoStageRetriever(Retriever):
     """

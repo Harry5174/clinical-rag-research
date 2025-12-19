@@ -1,6 +1,6 @@
 # Phase 1: Baseline Benchmarking Report
 
-**Date**: [DATE]
+**Date**: 2025-12-19
 **Dataset**: `discharge.csv` (Limit: 500 rows)
 **Evaluation Set**: 100 Query-Document Pairs (`baseline_dataset.json`)
 
@@ -23,7 +23,6 @@ This report establishes the baseline performance of the "Naive" RAG pipeline (Fi
 ## 3. Failure Mode Analysis (Top 5 Errors)
 *Qualitative analysis (to be populated in Phase 4 synthesis).*
 
-## 4. Conclusion
 ## 4. Conclusion
 The "Hybrid Semantic" strategy demonstrates a decisive advantage over standard fixed-size chunking for clinical discharge summaries. 
 

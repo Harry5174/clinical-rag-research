@@ -6,7 +6,7 @@ from typing import Optional
 
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 
-from src.app.indexing.advanced_chunking_strategy import AdvancedChunker, ChunkConfig, ChunkingStrategy
+from app.research.chunking.hybrid import AdvancedChunker, ChunkConfig, ChunkingStrategy
 
 def process_discharge_data(
     input_path: Path, 

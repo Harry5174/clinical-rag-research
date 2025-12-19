@@ -16,11 +16,25 @@ dependencies = [
     "pypdf>=6.2.0",
     "scikit-learn>=1.7.2",
     "sentence-transformers>=5.1.2",
+    "torch",
 ]
 
 [project.scripts]
 app = "app:main"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/app"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+torchaudio = { index = "pytorch-cpu" }

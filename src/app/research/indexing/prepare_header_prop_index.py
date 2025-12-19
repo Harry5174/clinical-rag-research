@@ -8,11 +8,11 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 # Setup paths
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-sys.path.append(str(BASE_DIR))
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent
+sys.path.append(str(BASE_DIR / "src"))
 
 # Import the chunking logic
-from src.research.chunking.hybrid import AdvancedChunker, ChunkConfig, ChunkingStrategy
+from app.research.chunking.hybrid import AdvancedChunker, ChunkConfig, ChunkingStrategy
 
 # CONFIG
 INPUT_CSV = BASE_DIR / "data" / "raw" / "discharge.csv"
