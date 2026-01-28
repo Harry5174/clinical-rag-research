@@ -35,6 +35,7 @@ class Retriever:
             results.append({
                 "score": float(distances[0][i]), # L2 distance (lower is better)
                 "text": meta.get("chunk_text"),
-                "note_id": meta.get("note_id")
+                "note_id": meta.get("note_id"),
+                "_metadata": meta # Helper for TIMER/Sidecar access
             })
         return results
