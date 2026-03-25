@@ -41,7 +41,8 @@ class TIMERScorer:
             r"history of", r"previous", r"past", r"long[- ]term", r"chronic",
             r"diagnosed in", r"recurrence", r"family history", r"mother", r"father",
             r"brother", r"sister", r"uncle", r"aunt", r"grandfather", r"grandmother",
-            r"first admission", r"initial", r"original", r"ever been", r"earliest"
+            r"first admission", r"initial", r"original", r"ever been", r"earliest",
+            r"first", r"first diagnosed", r"originally", r"initially"
         ]
         
         # 2. Current Intent Patterns (Default/Acute)

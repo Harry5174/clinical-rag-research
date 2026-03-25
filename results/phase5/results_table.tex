@@ -1,0 +1,15 @@
+\begin{table}
+\caption{TIMER-Graph vs. Semantic Baseline on Hard Negative Evaluation Suite. Significance: * p<0.05, ** p<0.01, *** p<0.001. Cohen's h: small≥0.2, medium≥0.5, large≥0.8.}
+\label{tab:timer_hard_negatives}
+\begin{tabular}{lrllllll}
+\toprule
+Scenario & N & Baseline Acc & TIMER Acc & Δ Acc & McNemar p & Sig & Cohen's h \\
+\midrule
+Semantic Collision & 50 & 50.00\% & 100.00\% & +50.00\% & 0.0000 & *** & 1.571 (large) \\
+Negation Recency & 30 & 100.00\% & 100.00\% & +0.00\% & 1.0000 & ns & 0.000 (negligible) \\
+Terminology Drift & 20 & 0.00\% & 60.00\% & +60.00\% & 0.0002 & *** & 1.772 (large) \\
+Real World Mining & 100 & 50.00\% & 100.00\% & +50.00\% & 0.0000 & *** & 1.571 (large) \\
+**OVERALL** & 200 & 52.50\% & 96.00\% & +43.50\% & 0.0000 & *** & 1.118 (large) \\
+\bottomrule
+\end{tabular}
+\end{table}
