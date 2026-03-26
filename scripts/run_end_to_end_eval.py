@@ -42,6 +42,11 @@ def main():
         
     queries = mocks['scenarios']['real_world_mining']
     
+    # Establish note_id -> subject_id mapping
+    note_to_subject = {}
+    for m in metadata:
+        note_to_subject[m['note_id']] = m.get('subject_id')
+    
     # 2. Setup Embedder & Scorer
     print("Loading embedder BAAI/bge-base-en-v1.5...")
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -80,19 +85,32 @@ def main():
         # Embed Query
         q_emb = model.encode([query_text], normalize_embeddings=True)
         
-        # Search FAISS
-        D, I = index.search(q_emb, 50)
+        target_subject_id = note_to_subject.get(expected_note_id)
+        
+        # Search FAISS massively
+        k = len(metadata)
+        D, I = index.search(q_emb, k)
         D = D[0]
         I = I[0]
         
         # Score Normalization: mapping Inner Product to [0,1]
-        S_norm = np.clip((D + 1.0) / 2.0, 0.0, 1.0)
+        S_norm_all = np.clip((D + 1.0) / 2.0, 0.0, 1.0)
+        
+        # Patient chunk filtering
+        filtered_I = []
+        filtered_S = []
+        for faiss_id, s_sem in zip(I, S_norm_all):
+            if faiss_id < 0 or faiss_id >= len(metadata): continue
+            meta = metadata[faiss_id]
+            if meta.get('subject_id') == target_subject_id:
+                filtered_I.append(faiss_id)
+                filtered_S.append(s_sem)
+        
+        top_k_I = filtered_I[:50]
+        top_k_S = filtered_S[:50]
         
         candidates = []
-        for rank, (faiss_id, s_sem) in enumerate(zip(I, S_norm)):
-            if faiss_id < 0 or faiss_id >= len(metadata):
-                continue
-                
+        for rank, (faiss_id, s_sem) in enumerate(zip(top_k_I, top_k_S)):
             meta = metadata[faiss_id]
             note_date_str = str(meta['charttime']).split(' ')[0]
             try:
@@ -166,9 +184,9 @@ def main():
         print(f"{c_name:<20} | {acc1:>.1%}    | {rec5:>.1%}")
         
     df = pd.DataFrame(export_data)
-    out_path = RESULTS_DIR / "end_to_end_results.csv"
+    out_path = RESULTS_DIR / "end_to_end_results_filtered.csv"
     df.to_csv(out_path, index=False)
-    print(f"\nSaved detailed results to {out_path}")
+    print(f"\nSaved detailed filtered results to {out_path}")
 
 if __name__ == "__main__":
     main()

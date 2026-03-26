@@ -81,180 +81,217 @@ print(all_results.groupby('scenario').size().to_string())
 print(f"\nBy Intent:")
 print(all_results.groupby('intent').size().to_string())
 # === Figure 1: Research Phase Progression ===
-fig, ax = plt.subplots(figsize=(12, 6))
+import seaborn as sns
+sns.set_theme(style="ticks", context="paper", font_scale=1.2)
+
+fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
 
 # Compile metrics across phases
 phases = {
-    'Phase 1\n(Naive)': {'recall5': phase1['results']['naive']['Recall@5'], 'type': 'baseline'},
-    'Phase 1\n(Hybrid)': {'recall5': phase1['results']['poc']['Recall@5'], 'type': 'improvement'},
-    'Phase 3\n(Cross-Encoder)': {'recall5': phase3['results']['Phase 3 (Reranking)']['Recall@5'], 'type': 'improvement'},
+    'Phase 1\n(Naive RAG)': {'recall5': phase1['results']['naive']['Recall@5'], 'type': 'Baseline'},
+    'Phase 1\n(Hybrid)': {'recall5': phase1['results']['poc']['Recall@5'], 'type': 'Increment'},
+    'Phase 3\n(Cross-Encoder)': {'recall5': phase3['results']['Phase 3 (Reranking)']['Recall@5'], 'type': 'Increment'}
 }
 
 # Add Phase 5 TIMER result (overall accuracy on hard negatives)
 overall_row = summary[summary['Scenario'] == '**OVERALL**']
 if len(overall_row) > 0:
     timer_acc = float(overall_row['TIMER Acc'].values[0].replace('%', '')) / 100
-    phases['Phase 5\n(TIMER-Graph)'] = {'recall5': timer_acc, 'type': 'novel'}
+    phases['Phase 5\n(TIMER-Graph)'] = {'recall5': timer_acc, 'type': 'Novel Contribution'}
 
-phase_names = list(phases.keys())
-recall_values = [phases[p]['recall5'] for p in phase_names]
-phase_types = [phases[p]['type'] for p in phase_names]
+df_prog = pd.DataFrame([
+    {'Phase': p, 'Accuracy': data['recall5'], 'Type': data['type']}
+    for p, data in phases.items()
+])
 
-# Color by type
-color_map = {'baseline': '#E5E7EB', 'improvement': '#93C5FD', 'novel': '#22C55E'}
-bar_colors = [color_map[t] for t in phase_types]
+# Journal-worthy palette (Cool gray, azure blue, deep royal)
+pal = {'Baseline': '#ced4da', 'Increment': '#48cae4', 'Novel Contribution': '#023e8a'}
 
-# Create bars
-bars = ax.bar(phase_names, recall_values, color=bar_colors, edgecolor='black', linewidth=1.5)
+# Draw bars with seaborn
+sns.barplot(
+    data=df_prog, x='Phase', y='Accuracy', hue='Type', 
+    palette=pal, edgecolor=".2", linewidth=1.5,
+    dodge=False, ax=ax
+)
 
-# Add value labels
-for bar, val in zip(bars, recall_values):
-    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.02,
-           f'{val:.0%}', ha='center', va='bottom', fontsize=13, fontweight='bold')
+# Customize spines (clean, academic look)
+sns.despine(left=True, bottom=True)
+ax.grid(axis='y', linestyle='--', alpha=0.7)
 
-# Add improvement arrows
-for i in range(1, len(recall_values)):
-    delta = recall_values[i] - recall_values[i-1]
-    if delta > 0:
-        mid_x = i - 0.5
-        mid_y = (recall_values[i] + recall_values[i-1]) / 2
-        ax.annotate(f'+{delta:.0%}', xy=(mid_x, mid_y), fontsize=10, 
-                   color=COLORS['success'], fontweight='bold', ha='center')
+# Add value labels and improvement annotations
+for i, row in df_prog.iterrows():
+    # Bar height text
+    ax.text(i, row['Accuracy'] + 0.02, f"{row['Accuracy']:.0%}", 
+            ha='center', va='bottom', fontsize=12, fontweight='bold', color='#343a40')
+    
+    # Delta improvements
+    if i > 0:
+        prev = df_prog.iloc[i-1]['Accuracy']
+        delta = row['Accuracy'] - prev
+        if delta > 0:
+            mid_x = i - 0.5
+            mid_y = (row['Accuracy'] + prev) / 2
+            ax.annotate(f'+{delta:.0%}', xy=(mid_x, mid_y), fontsize=11, 
+                       color='#d90429', fontweight='bold', ha='center',
+                       bbox=dict(boxstyle="round,pad=0.2", fc="white", ec="none", alpha=0.85))
 
 # Styling
-ax.set_ylabel('Accuracy (Recall@5 / Hard Neg Accuracy)', fontsize=12)
+ax.set_ylabel('Recall@5 / Hard Negative Accuracy', fontsize=13, fontweight='medium', labelpad=15)
+ax.set_xlabel('')
 ax.set_ylim(0, 1.15)
-ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5, label='Random Baseline')
-ax.set_title('Research Journey: From Naive RAG to TIMER-Graph', fontsize=16, fontweight='bold')
+ax.axhline(y=0.5, color='#adb5bd', linestyle=':', linewidth=2, zorder=0)
+ax.text(3.4, 0.51, 'Random Chance', color='#6c757d', fontsize=10, ha='right', va='bottom')
 
-# Legend for phase types
-legend_elements = [
-    mpatches.Patch(facecolor='#E5E7EB', edgecolor='black', label='Baseline'),
-    mpatches.Patch(facecolor='#93C5FD', edgecolor='black', label='Incremental Improvement'),
-    mpatches.Patch(facecolor='#22C55E', edgecolor='black', label='Novel Contribution'),
-]
-ax.legend(handles=legend_elements, loc='upper left', fontsize=10)
+# Title 
+ax.set_title('Accuracy Progression: Naive RAG to TIMER-Graph', fontsize=15, fontweight='bold', pad=20)
 
-# Add annotation box
-ax.text(0.98, 0.05, f'Final Improvement:\n+{(timer_acc - phase1["results"]["naive"]["Recall@5"]):.0%} over naive',
-       transform=ax.transAxes, ha='right', va='bottom', fontsize=11,
-       bbox=dict(boxstyle='round', facecolor='white', edgecolor='gray'))
+# Legend positioning
+handles, labels = ax.get_legend_handles_labels()
+ax.legend(handles, labels, title='', loc='upper left', frameon=True, fontsize=11, edgecolor='silver', facecolor='white')
+
+# Add abstract annotation box
+final_imp = timer_acc - phase1["results"]["naive"]["Recall@5"]
+ax.text(0.98, 0.05, f'Absolute Accuracy Gain: +{final_imp:.0%}',
+       transform=ax.transAxes, ha='right', va='bottom', fontsize=11, fontweight='bold', color='#023e8a',
+       bbox=dict(boxstyle='round', facecolor='#f8f9fa', edgecolor='#023e8a', alpha=0.9, pad=0.5))
 
 plt.tight_layout()
-plt.savefig(PLOTS_DIR / 'eval1_phase_progression.png', bbox_inches='tight', facecolor='white')
-plt.savefig(PLOTS_DIR / 'eval1_phase_progression.pdf', bbox_inches='tight')
+plt.savefig(PLOTS_DIR / 'eval1_phase_progression.png', bbox_inches='tight', facecolor='white', dpi=300)
+plt.savefig(PLOTS_DIR / 'eval1_phase_progression.pdf', bbox_inches='tight', dpi=300)
 print(f'✓ Saved: {PLOTS_DIR}/eval1_phase_progression.png')
-plt.show()
-# === Figure 2: Grouped Bar Chart - Baseline vs TIMER ===
-fig, ax = plt.subplots(figsize=(12, 7))
 
-# Prepare data - exclude overall
+# === Figure 2: Grouped Bar Chart - Baseline vs TIMER ===
+import seaborn as sns
+sns.set_theme(style="whitegrid", context="paper", font_scale=1.2)
+
+fig, ax = plt.subplots(figsize=(10, 6), dpi=300)
+
+# Prepare data for Seaborn (long format)
 df_scenarios = summary[summary['Scenario'] != '**OVERALL**'].copy()
 df_scenarios['Baseline'] = df_scenarios['Baseline Acc'].str.replace('%', '').astype(float)
 df_scenarios['TIMER'] = df_scenarios['TIMER Acc'].str.replace('%', '').astype(float)
 
-# Plot settings
-x = np.arange(len(df_scenarios))
-width = 0.35
+# Scenario mapping for cleaner labels
+scenario_map = {
+    'semantic_collision': 'Semantic\nCollision',
+    'negation_recency': 'Negation\nRecency',
+    'terminology_drift': 'Terminology\nDrift',
+    'real_world_mining': 'Real-World\nMining'
+}
+df_scenarios['Display Name'] = df_scenarios['Scenario'].map(lambda x: f"{scenario_map.get(x, x)}\n(n={df_scenarios[df_scenarios['Scenario']==x]['N'].values[0]})")
 
-# Create grouped bars
-bars1 = ax.bar(x - width/2, df_scenarios['Baseline'], width, 
-               label='Semantic Baseline', color=COLORS['baseline'], edgecolor='black', linewidth=1.2)
-bars2 = ax.bar(x + width/2, df_scenarios['TIMER'], width,
-               label='TIMER-Graph', color=COLORS['timer'], edgecolor='black', linewidth=1.2)
+df_long = pd.melt(df_scenarios, id_vars=['Display Name', 'Sig'], value_vars=['Baseline', 'TIMER'],
+                  var_name='Model', value_name='Accuracy')
+df_long['Model'] = df_long['Model'].replace({'Baseline': 'Semantic Baseline', 'TIMER': 'TIMER-Graph'})
 
-# Add value labels
-def add_labels(bars, fontweight='normal'):
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, height + 1.5,
-               f'{height:.0f}%', ha='center', va='bottom', fontsize=10, fontweight=fontweight)
+# Engaging Color Palette (Orange and Teal)
+pal = {'Semantic Baseline': '#d95f02', 'TIMER-Graph': '#1b9e77'}
 
-add_labels(bars1)
-add_labels(bars2, fontweight='bold')
+# Plot
+sns.barplot(data=df_long, x='Display Name', y='Accuracy', hue='Model', 
+            palette=pal, edgecolor=".2", linewidth=1.5, ax=ax)
 
-# Add improvement annotations
-for i, (b1, b2) in enumerate(zip(bars1, bars2)):
-    improvement = b2.get_height() - b1.get_height()
-    if improvement > 0:
-        ax.annotate(f'+{improvement:.0f}%', 
-                   xy=(x[i], max(b1.get_height(), b2.get_height()) + 10),
-                   fontsize=11, color=COLORS['success'], fontweight='bold', ha='center')
+# Style
+sns.despine(ax=ax, left=True)
+ax.set_ylabel('Accuracy (%)', fontsize=12, labelpad=10)
+ax.set_xlabel('', fontsize=12)
+ax.set_title('Hard Negative Stress Test Results ($n=200$)', fontsize=14, fontweight='bold', pad=20)
 
-# Styling
-ax.set_ylabel('Accuracy (%)', fontsize=12)
-ax.set_xlabel('Scenario Type', fontsize=12)
-ax.set_title('Hard Negative Stress Test: TIMER-Graph vs Semantic Baseline', fontsize=14, fontweight='bold')
-ax.set_xticks(x)
-ax.set_xticklabels(df_scenarios['Scenario'], rotation=0)
-ax.set_ylim(0, 115)
-ax.legend(loc='upper right', fontsize=11)
+# Add value labels and significance markers
+for i, scenario in enumerate(df_scenarios['Display Name']):
+    # Get values for this scenario
+    b_val = df_scenarios.iloc[i]['Baseline']
+    t_val = df_scenarios.iloc[i]['TIMER']
+    sig = df_scenarios.iloc[i]['Sig']
+    
+    # Position for bars (using index i and width offset)
+    # Seaborn bar centers are at integer positions
+    ax.text(i - 0.2, b_val + 1, f'{b_val:.0f}%', ha='center', va='bottom', fontsize=10, fontweight='bold')
+    ax.text(i + 0.2, t_val + 1, f'{t_val:.0f}%', ha='center', va='bottom', fontsize=10, fontweight='bold')
+    
+    # Significance marker (ns or stars)
+    sig_text = sig if sig != 'ns' else 'ns'
+    ax.text(i, max(b_val, t_val) + 10, sig_text, ha='center', va='bottom', 
+            fontsize=11, fontweight='bold', color='#4a4a4a')
 
-# Add random baseline line
-ax.axhline(y=50, color='gray', linestyle='--', alpha=0.6, linewidth=1.5)
-ax.text(len(df_scenarios)-0.5, 52, 'Random Chance (50%)', fontsize=9, color='gray')
+# Headroom and Legend
+ax.set_ylim(0, 130) # Increased to 130 for significance text
+ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., 
+          frameon=True, edgecolor='silver', facecolor='white')
 
 plt.tight_layout()
-plt.savefig(PLOTS_DIR / 'eval2_scenario_comparison.png', bbox_inches='tight', facecolor='white')
-plt.savefig(PLOTS_DIR / 'eval2_scenario_comparison.pdf', bbox_inches='tight')
+plt.savefig(PLOTS_DIR / 'eval2_scenario_comparison.png', bbox_inches='tight', facecolor='white', dpi=300)
+plt.savefig(PLOTS_DIR / 'eval2_scenario_comparison.pdf', bbox_inches='tight', dpi=300)
 print(f'✓ Saved: {PLOTS_DIR}/eval2_scenario_comparison.png')
-plt.show()
+
 # === Figure 3: Per-Query Win/Loss Heatmap ===
-fig, ax = plt.subplots(figsize=(14, 10))
+fig, axes = plt.subplots(1, 2, figsize=(12, 6), sharey=True)
 
 # Prepare data for heatmap
 all_results['baseline_correct_int'] = all_results['baseline_correct'].astype(int)
 all_results['timer_correct_int'] = all_results['timer_correct'].astype(int)
 
-# Create matrix: rows=queries, columns=[Baseline, TIMER]
-heatmap_data = all_results[['query_id', 'scenario', 'baseline_correct_int', 'timer_correct_int']].copy()
-heatmap_data = heatmap_data.sort_values(['scenario', 'query_id'])
+# Sort exactly as requested
+scenario_order = {
+    'semantic_collision': 0, 'collision_multi_temporal': 0,
+    'negation_recency': 1, 'negation_subsequent': 1,
+    'terminology_drift': 2,
+    'real_world_mining': 3, 'mining_base': 3
+}
+all_results['scenario_idx'] = all_results['scenario'].map(lambda x: scenario_order.get(x, 99))
+heatmap_data = all_results.sort_values(['scenario_idx', 'query_id'])
 
-# Create display matrix
-matrix = heatmap_data[['baseline_correct_int', 'timer_correct_int']].values
+# Reshape into 10x20
+base_matrix = heatmap_data['baseline_correct_int'].values.reshape(10, 20)
+timer_matrix = heatmap_data['timer_correct_int'].values.reshape(10, 20)
 
-# Custom colormap: red for wrong, green for correct
-cmap = LinearSegmentedColormap.from_list('correct', ['#FEE2E2', '#DCFCE7'])
+from matplotlib.colors import ListedColormap
+# Custom colormap: orange for wrong, green for correct
+cmap = ListedColormap(['#d95f02', '#1b9e77']) 
 
-# Plot
-im = ax.imshow(matrix, cmap=cmap, aspect='auto')
+# Plot Baseline
+axes[0].imshow(base_matrix, cmap=cmap, aspect='auto', vmin=0, vmax=1)
+axes[0].set_title('Semantic Baseline', fontsize=11, fontweight='bold')
+axes[0].set_ylabel('Query row (20 per row)', fontsize=11, labelpad=30)
 
-# Labels
-ax.set_xticks([0, 1])
-ax.set_xticklabels(['Semantic\nBaseline', 'TIMER-Graph'], fontsize=12, fontweight='bold')
-ax.set_yticks(range(len(heatmap_data)))
-ax.set_yticklabels([f"{row['query_id']} ({row['scenario'][:10]})" for _, row in heatmap_data.iterrows()], fontsize=8)
+# Plot TIMER
+axes[1].imshow(timer_matrix, cmap=cmap, aspect='auto', vmin=0, vmax=1)
+axes[1].set_title('TIMER-Graph', fontsize=11, fontweight='bold')
 
-# Add cell text
-for i in range(len(matrix)):
-    for j in range(2):
-        text = '✓' if matrix[i, j] == 1 else '✗'
-        color = COLORS['success'] if matrix[i, j] == 1 else COLORS['failure']
-        ax.text(j, i, text, ha='center', va='center', fontsize=10, color=color, fontweight='bold')
+# Add grid lines and grouping boundaries
+import numpy as np
+for ax in axes:
+    ax.set_xticks(np.arange(-.5, 20, 1), minor=True)
+    ax.set_yticks(np.arange(-.5, 10, 1), minor=True)
+    ax.grid(which='minor', color='w', linestyle='-', linewidth=0.5)
+    ax.tick_params(which='minor', bottom=False, left=False)
+    
+    # Boundary lines for scenarios
+    ax.axhline(2.5, color='black', linestyle=':', linewidth=1.5, alpha=0.6)
+    ax.axhline(4.0, color='black', linestyle=':', linewidth=1.5, alpha=0.6)
+    ax.axhline(5.0, color='black', linestyle=':', linewidth=1.5, alpha=0.6)
 
-# Highlight TIMER wins (improvement cases)
-for i in range(len(matrix)):
-    if matrix[i, 0] == 0 and matrix[i, 1] == 1:  # Baseline wrong, TIMER correct
-        ax.add_patch(plt.Rectangle((0.5, i-0.5), 1, 1, fill=False, edgecolor=COLORS['success'], linewidth=2))
+# Scenario labels
+axes[0].text(-2.2, 1.25, 'SC', ha='right', va='center', fontsize=9, color='gray')
+axes[0].text(-2.2, 3.25, 'NR', ha='right', va='center', fontsize=9, color='gray')
+axes[0].text(-2.2, 4.5, 'TD', ha='right', va='center', fontsize=9, color='gray')
+axes[0].text(-2.2, 7.5, 'RWM', ha='right', va='center', fontsize=9, color='gray')
 
-ax.set_title('Per-Query Correctness: Baseline vs TIMER-Graph\n(Green highlight = TIMER improvement)', 
-            fontsize=14, fontweight='bold')
+# Summary stats
+base_acc = heatmap_data['baseline_correct_int'].mean() * 100
+timer_acc = heatmap_data['timer_correct_int'].mean() * 100
 
-# Add summary stats
-baseline_acc = matrix[:, 0].mean() * 100
-timer_acc = matrix[:, 1].mean() * 100
-improvements = ((matrix[:, 0] == 0) & (matrix[:, 1] == 1)).sum()
+axes[0].text(0.5, -0.1, f'Accuracy: {base_acc:.1f}%', transform=axes[0].transAxes, 
+             ha='center', va='top', fontsize=11, fontweight='bold', color='#d95f02')
+axes[1].text(0.5, -0.1, f'Accuracy: {timer_acc:.1f}%', transform=axes[1].transAxes, 
+             ha='center', va='top', fontsize=11, fontweight='bold', color='#1b9e77')
 
-stats_text = f'Baseline: {baseline_acc:.0f}%\nTIMER: {timer_acc:.0f}%\nImprovements: {improvements}'
-ax.text(1.15, 0.5, stats_text, transform=ax.transAxes, fontsize=11,
-       bbox=dict(boxstyle='round', facecolor='white', edgecolor='gray'),
-       verticalalignment='center')
-
-plt.tight_layout()
-plt.savefig(PLOTS_DIR / 'eval3_query_heatmap.png', bbox_inches='tight', facecolor='white')
-plt.savefig(PLOTS_DIR / 'eval3_query_heatmap.pdf', bbox_inches='tight')
+plt.tight_layout(rect=[0.0, 0.0, 1.0, 0.90])
+fig.suptitle('Per-Query Correctness ($n=200$)', fontsize=14, fontweight='bold', y=0.98)
+plt.savefig(PLOTS_DIR / 'eval3_query_heatmap.png', bbox_inches='tight', facecolor='white', dpi=300)
+plt.savefig(PLOTS_DIR / 'eval3_query_heatmap.pdf', bbox_inches='tight', dpi=300)
 print(f'✓ Saved: {PLOTS_DIR}/eval3_query_heatmap.png')
-plt.show()
+
 # === Figure 4: Intent Detection Confusion Matrix ===
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -315,7 +352,7 @@ plt.tight_layout()
 plt.savefig(PLOTS_DIR / 'eval4_intent_analysis.png', bbox_inches='tight', facecolor='white')
 plt.savefig(PLOTS_DIR / 'eval4_intent_analysis.pdf', bbox_inches='tight')
 print(f'✓ Saved: {PLOTS_DIR}/eval4_intent_analysis.png')
-plt.show()
+
 # === Figure 5: TIMER Win Analysis ===
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
@@ -377,7 +414,7 @@ plt.tight_layout()
 plt.savefig(PLOTS_DIR / 'eval5_improvement_analysis.png', bbox_inches='tight', facecolor='white')
 plt.savefig(PLOTS_DIR / 'eval5_improvement_analysis.pdf', bbox_inches='tight')
 print(f'✓ Saved: {PLOTS_DIR}/eval5_improvement_analysis.png')
-plt.show()
+
 # === Examine failure cases ===
 failures = all_results[all_results['timer_correct'] == False].copy()
 
@@ -427,13 +464,13 @@ plt.tight_layout()
 plt.savefig(PLOTS_DIR / 'eval6_failure_analysis.png', bbox_inches='tight', facecolor='white')
 plt.savefig(PLOTS_DIR / 'eval6_failure_analysis.pdf', bbox_inches='tight')
 print(f'✓ Saved: {PLOTS_DIR}/eval6_failure_analysis.png')
-plt.show()
+
 # === Figure 7: Summary Statistics Table ===
 fig, ax = plt.subplots(figsize=(12, 4))
 ax.axis('off')
 
 # Prepare summary table
-summary_display = summary.copy()
+summary_display = summary[['Scenario', 'N', 'Baseline Acc', 'TIMER Acc', 'Δ Acc', 'TIMER Wins']].copy()
 summary_display.columns = ['Scenario', 'N', 'Baseline', 'TIMER', 'Δ', 'Wins']
 
 # Create table
@@ -473,7 +510,7 @@ plt.tight_layout()
 plt.savefig(PLOTS_DIR / 'eval7_summary_table.png', bbox_inches='tight', facecolor='white')
 plt.savefig(PLOTS_DIR / 'eval7_summary_table.pdf', bbox_inches='tight')
 print(f'✓ Saved: {PLOTS_DIR}/eval7_summary_table.png')
-plt.show()
+
 # List all generated files
 print('\n=== Generated Evaluation Visualizations ===')
 for f in sorted(PLOTS_DIR.glob('eval*.png')):
