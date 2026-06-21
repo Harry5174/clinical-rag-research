@@ -8,19 +8,19 @@ This sanitized manifest records provenance, hashes, schema, and aggregate findin
 
 | Path | Type; size; SHA-256 prefix | Safe summary | Likely producer | Category | Authority | Sensitivity | Notes |
 |---|---|---|---|---|---|---|---|
-| results/phase5/summary_table.csv | CSV; 657 B; c5e33a5c41a74099 | 5 rows; n=200; baseline 52.5%; TIMER 96.0% | run_hard_negative_eval.py with unrecorded arguments | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | aggregate-only | Matches tracked Phase 5 TeX table, but lacks input/config/run manifest. |
+| results/phase5/summary_table.csv | CSV; 657 B; c5e33a5c41a74099 | 5 rows; n=200; baseline 52.5%; TIMER 96.0% | run_hard_negative_eval.py with the v2 input | CONTROLLED / SIMULATED | AUTHORITATIVE_EXISTING | aggregate-only | Sprint 1.4 reproduced this exact hash in isolated /tmp output with current evaluator, current v2 input, and captured environment/input hashes. |
 | results/phase5/semantic_collision_results.csv | CSV; 6,214 B; 6aa8156bd52557e2 | 50 rows; baseline 25/50; TIMER 50/50 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Query/retrieval fields not reproduced. |
 | results/phase5/negation_recency_results.csv | CSV; 4,483 B; 68bc1d6a49fbc797 | 30 rows; baseline 30/30; TIMER 30/30 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Byte-identical to v2 counterpart. |
 | results/phase5/terminology_drift_results.csv | CSV; 3,011 B; c7b512169226d98e | 20 rows; baseline 0/20; TIMER 12/20 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Supplies the material v1/v2 difference. |
 | results/phase5/real_world_mining_results.csv | CSV; 13,233 B; 89ed020d726460fd | 100 rows; baseline 50/100; TIMER 100/100 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Byte-identical to v2 counterpart. |
-| results/phase5/results_table.tex | TeX; 831 B; 2e2753b3bb2e0a78 | n=200; 52.5% / 96.0% | hard-negative evaluator | REPORT | CONFLICT_UNRESOLVED | aggregate-only | Git-tracked in the 2026-03-25 Phase 5 commit; run configuration is absent. |
-| results/phase5_v2/summary_table.csv | CSV; 652 B; ae9ad80013c8cd5c | 5 rows; n=200; baseline 52.5%; TIMER 90.5% | hard-negative evaluator with unrecorded arguments | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | aggregate-only | Conflicts with Phase 5. |
+| results/phase5/results_table.tex | TeX; 831 B; 2e2753b3bb2e0a78 | n=200; 52.5% / 96.0% | hard-negative evaluator | REPORT | AUTHORITATIVE_EXISTING | aggregate-only | Exact isolated Sprint 1.4 reproduction output hash; controlled/simulated interpretation remains required. |
+| results/phase5_v2/summary_table.csv | CSV; 652 B; ae9ad80013c8cd5c | 5 rows; n=200; baseline 52.5%; TIMER 90.5% | historical hard-negative evaluator run | CONTROLLED / SIMULATED | SUPERSEDED | aggregate-only | Sprint 1.4 current evaluator plus current v2 input reproduced the exact Phase 5 96.0% output instead; original v2 run provenance remains historical. |
 | results/phase5_v2/semantic_collision_results.csv | CSV; 6,214 B; 6aa8156bd52557e2 | 50 rows; baseline 25/50; TIMER 50/50 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Same as Phase 5 counterpart. |
 | results/phase5_v2/negation_recency_results.csv | CSV; 4,483 B; 68bc1d6a49fbc797 | 30 rows; baseline 30/30; TIMER 30/30 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Same as Phase 5 counterpart. |
 | results/phase5_v2/terminology_drift_results.csv | CSV; 2,957 B; 32bc347e7f98727d | 20 rows; baseline 0/20; TIMER 1/20 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Conflicts with Phase 5 terminology-drift result. |
 | results/phase5_v2/real_world_mining_results.csv | CSV; 13,233 B; 89ed020d726460fd | 100 rows; baseline 50/100; TIMER 100/100 | same | CONTROLLED / SIMULATED | CONFLICT_UNRESOLVED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Same as Phase 5 counterpart. |
 | results/phase5_v2/results_table.tex | TeX; 833 B; 0b3e85914e1aa04c | n=200; 52.5% / 90.5% | hard-negative evaluator | REPORT | CONFLICT_UNRESOLVED | aggregate-only | Publication-shaped conflicting headline, not a resolution. |
-| results/phase9/end_to_end_results_filtered.csv | CSV; 18,126 B; bcf806f3fb631012 | n=100; semantic-only 22% Accuracy@1 / 69% Recall@5; full TIMER 58% / 80% | current run_end_to_end_eval.py | END_TO_END | LIKELY_AUTHORITATIVE_BUT_NEEDS_REPRODUCTION | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Current script writes this filename after patient-specific filtering. |
+| results/phase9/end_to_end_results_filtered.csv | CSV; 18,126 B; bcf806f3fb631012 | n=100; semantic-only 22% Accuracy@1 / 69% Recall@5; full TIMER 58% / 80% | current run_end_to_end_eval.py | END_TO_END | AUTHORITATIVE_EXISTING | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Sprint 1.4 reproduced this exact hash using an isolated script copy with only the output path changed; current target-subject filtering was preserved. |
 | results/phase9/end_to_end_results.csv | CSV; 19,500 B; 117e7e0eadadaf4c | n=100; semantic-only 1% / 1%; full TIMER 1% / 4% | pre-filter end-to-end script | END_TO_END | SUPERSEDED | LOCAL_RESTRICTED_DO_NOT_PUBLISH | Later tracked change adds filtering and changes output filename. |
 
 ## Inputs, sidecar, and indexes
@@ -49,7 +49,6 @@ This sanitized manifest records provenance, hashes, schema, and aggregate findin
 
 ## Authority decision
 
-1. The 96.0% and 90.5% hard-negative headlines are both aggregate-supported but remain CONFLICT_UNRESOLVED and need a supervisor decision or future controlled reproduction.
-2. The filtered Phase 9 artifact is LIKELY_AUTHORITATIVE_BUT_NEEDS_REPRODUCTION; the unfiltered artifact is SUPERSEDED.
+1. The 96.0% hard-negative result is AUTHORITATIVE_EXISTING for the explicitly controlled/simulated current evaluator plus current v2 input: Sprint 1.4 reproduced every output hash in isolated /tmp output. The 90.5% v2 result is SUPERSEDED as a current result, though its original historical-run cause is not recoverable from ignored artifacts.
+2. The filtered Phase 9 artifact is AUTHORITATIVE_EXISTING for the current target-subject-filtered local implementation: Sprint 1.4 reproduced its exact output hash with only the output path isolated. The unfiltered artifact is SUPERSEDED.
 3. The inspected index metric is IndexFlatL2 / METRIC_L2, so literal paper claims of IndexFlatIP require NEEDS_PAPER_CORRECTION.
-
