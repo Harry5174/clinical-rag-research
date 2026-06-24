@@ -162,13 +162,13 @@ Comment:
 The comment asks about weighted scheduling, heterogeneous workloads, or a DC2 anomaly, but the current traceability records do not confirm a manuscript target.
 
 Response:
-Thank you for the comment. We have not forced a manuscript response because no confirmed manuscript target was identified in the approved traceability records or location-reference search. We therefore mark this item as requiring supervisor clarification before any rebuttal or manuscript-specific response is finalized. We avoid inventing a correction or claiming it was addressed without traceable evidence.
+Thank you for the comment. We reviewed the manuscript for weighted-scheduling / heterogeneous-workload positioning. No active claim requiring a separate manuscript correction was identified in the revised manuscript. We therefore do not introduce a new unsupported claim or experiment. The current revision focuses on the major retrieval, scoring, evaluation, router, sidecar, baseline, and limitation issues addressed in the manuscript.
 
 Manuscript location:
 No confirmed manuscript target.
 
 Status:
-Supervisor decision required.
+Reviewed -- no manuscript target identified / no manuscript edit required.
 
 ## 4. Comments addressed by manuscript correction
 
@@ -195,15 +195,17 @@ Supervisor decision required.
 - Phase 9 score-treatment analysis.
 - Downstream clinical or LLM outcome validation.
 
-## 7. Open supervisor decisions
+Under the final Sprint 4.2 working decision, no extra analysis is required before ASAP submission; these unresolved items remain limitation-framed or future work.
 
-- Whether to keep the `TIMER-Graph` title/name as-is for submission.
-- Final journal-safe code availability wording.
-- Final journal-safe supplementary material wording.
-- Source-tracking / export path for ignored LaTeX files.
-- P38 handling.
-- Whether limitation framing is sufficient for submission or whether extra analysis is required before final rebuttal.
+## 7. Final working decisions
+
+- Title: keep the `TIMER-Graph` title/name for this submission cycle.
+- Code availability: use conservative restricted-data-safe wording and do not promise public code release.
+- Supplementary material: do not submit or invent supplementary material unless a later supervisor decision supplies one.
+- Source tracking/export: use local/Overleaf export handoff; do not modify `.gitignore`, force-add ignored files, stage, commit, or push.
+- P38: handle as reviewed / no manuscript target identified / rebuttal-only.
+- Extra analysis: no extra analysis before ASAP submission; unresolved analysis items remain limitation-framed or future work.
 
 ## 8. Submission note
 
-For ASAP submission, the recommended path is to keep the title, keep limitation framing, and avoid new experiments unless the supervisor specifically requests them. This rebuttal draft is ready for Implementation Supervisor review, subject to the open decisions above.
+For ASAP submission, the recommended path is to keep the title, keep limitation framing, use local/Overleaf export handoff, and avoid new experiments unless the supervisor specifically requests them. This rebuttal draft is ready for Implementation Supervisor review under the final working decisions above.

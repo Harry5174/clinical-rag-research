@@ -1,51 +1,41 @@
-# Open Supervisor Decisions Before Submission -- Sprint 4.1
+# Final Working Decisions Before Submission -- Sprint 4.2
 
 ## Recommendation for ASAP submission
 
-For ASAP submission, keep the `TIMER-Graph` title/name, keep limitation framing, and do not run new experiments unless the supervisor specifically requests them.
+For ASAP submission, keep the `TIMER-Graph` title/name, keep limitation framing, do not run new experiments, and use the local/Overleaf export handoff path unless the supervisor later requests a different route.
 
-## 1. Keep TIMER-Graph title with body clarification, or revise title?
+## 1. Title decision
 
-Recommendation: keep `TIMER-Graph` as the method/system name for this submission cycle. The rebuttal should clarify that the manuscript now describes a temporal metadata sidecar implementation and does not claim graph nodes, graph edges, traversal, or graph database behavior.
+Final working decision: keep `TIMER-Graph` title/name.
 
-Decision needed: confirm title/name retention, or request a separate title-revision sprint.
+Rationale: the manuscript body now clarifies that `TIMER-Graph` is retained as the method/system name while the implementation is described as a temporal metadata sidecar, not a graph database, node-edge graph, graph traversal system, or observed clinical temporal graph.
 
-## 2. Final journal-safe code availability wording
+## 2. Code availability decision
 
-Current manuscript posture: code release requires a separate supervisor decision and approved public-release review.
+Final working decision: use conservative restricted-data-safe wording.
 
-Recommendation: keep the current guarded wording unless the supervisor approves a public-release package.
+Applied manuscript posture: the implementation code is not publicly released with this submission. A sanitized version may be made available from the corresponding author upon reasonable request after institutional and public-release review. Restricted clinical data, raw MIMIC-IV-Note text, processed note text, indexes, and restricted-data-derived artifacts are not redistributed.
 
-Decision needed: final journal-safe code availability statement.
+## 3. Supplementary material decision
 
-## 3. Final journal-safe supplementary material wording
+Final working decision: no supplementary material is submitted unless the supervisor later supplies an approved package.
 
-Current manuscript posture: supplementary file availability is not asserted; any sanitized supplementary package requires separate supervisor review and approval.
+Applied manuscript posture: supplementary file availability is not asserted. No supplement is invented in this sprint.
 
-Recommendation: keep the current guarded wording unless a reviewed supplementary package is actually prepared.
+## 4. Source-tracking / export decision
 
-Decision needed: final journal-safe supplementary material statement.
+Final working decision: do not modify `.gitignore`, do not force-add ignored LaTeX files, do not stage, commit, or push. Use local/Overleaf export handoff for ASAP submission.
 
-## 4. Source-tracking / export path for ignored LaTeX files
+Handoff posture: revised LaTeX source remains in `latex_publication/v1/`; temporary handoff artifacts are copied outside the repository for supervisor review.
 
-Current state: `latex_publication/` is ignored by Git, so normal Git status/diff does not verify manuscript-source edits.
+## 5. P38 decision
 
-Recommendation: for supervisor review, use the documented Phase 03 `/tmp` diff process and Phase 03/04 traceability docs. Before final submission, choose one source-of-truth path: manual export from local/Overleaf source, force-add approved final LaTeX files, or modify `.gitignore` in a separate closeout sprint.
+Final working decision: rebuttal-only / no manuscript target identified / no new unsupported claim.
 
-Decision needed: final source-tracking/export path.
+Response posture: we reviewed the manuscript for weighted-scheduling / heterogeneous-workload positioning. No active claim requiring a separate manuscript correction was identified in the revised manuscript, so no manuscript edit is made and no new experiment is introduced.
 
-## 5. P38 handling
+## 6. Extra-analysis decision
 
-Current state: no confirmed manuscript target was identified for weighted scheduling, heterogeneous workloads, or the DC2 anomaly.
+Final working decision: no extra analysis is required before ASAP submission under the current working decision.
 
-Recommendation: mark P38 as supervisor-decision-required unless the supervisor supplies the intended manuscript location or confirms it can be excluded.
-
-Decision needed: clarify whether P38 needs a response and, if so, identify the exact target.
-
-## 6. Whether extra analysis is required before final rebuttal
-
-Current manuscript posture: router analysis, sensitivity analysis, score-treatment analysis, comparator baselines, and downstream clinical/LLM validation are limitation-framed or future work.
-
-Recommendation: do not run new experiments for ASAP submission unless the supervisor decides limitation framing is insufficient.
-
-Decision needed: confirm whether current limitation framing is sufficient for final rebuttal.
+Unresolved items remain limitation-framed or future work, including score-treatment analysis, router analysis, confidence distribution, regex near-miss analysis, sensitivity analysis, STAR-RAG-style baseline, simple time-filter baseline, additional failure analysis, and new reproduction.
